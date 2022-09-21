@@ -1,5 +1,6 @@
 package kamyshks;
 
+import kamyshks.exceptions.ValidateIndexException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 @RunWith(JUnit4.class)
 public class PortTest {
@@ -19,7 +21,7 @@ public class PortTest {
     private final String [] indexes = {"1-4,7", "3-8", "56,33,58,11"};
 
     @Before
-    public void setUp(){
+    public void setUp() throws ValidateIndexException {
         port = new Port(indexes);
     }
 
@@ -36,21 +38,27 @@ public class PortTest {
     }
 
     @Test
-    public void convertIndexesTest(){
+    public void convertIndexesTest() {
         final List<List<Integer>> assertList = new ArrayList<>(Arrays.asList(
                 Arrays.asList(1,2,3,4,7), Arrays.asList(3,4,5,6,7,8), Arrays.asList(56,33,58,11)));
         assertEquals(assertList, port.convertIndexes());
     }
 
     @Test
-    public void parseOneItemTest(){
+    public void parseOneItemTest() {
         final List<Integer> assertList = new ArrayList<>(Arrays.asList(3, 4, 5, 6, 7, 8));
         assertEquals(assertList, port.parseOneItem(indexes[1]));
     }
 
     @Test
-    public void parseAllTest(){
+    public void parseAllTest() {
         final List<Integer> assertList = new ArrayList<>(Arrays.asList(1,2,3,4,7));
         assertEquals(assertList, port.parseAll(indexes[0]));
     }
+
+    @Test
+    public void asserException() {
+        assertThrows(ValidateIndexException.class, () -> new Port(new String[]{"g,7-j", "j"}));
+    }
+
 }

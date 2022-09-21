@@ -1,11 +1,13 @@
 package kamyshks;
 
+import kamyshks.exceptions.ValidateIndexException;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ValidateIndexException {
 
         final Port port = new Port(args);
 

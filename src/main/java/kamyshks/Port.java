@@ -1,20 +1,30 @@
 package kamyshks;
 
-import java.util.*;
+import kamyshks.exceptions.ValidateIndexException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Port {
     private String[] indexes;
 
-    public Port(final String[] indexes) {
+    public Port(final String[] indexes) throws ValidateIndexException {
         validateIndexes(indexes);
         this.indexes = indexes;
     }
 
-    public void validateIndexes(final String[] indexes){
-
+    public void validateIndexes(final String[] indexes) throws ValidateIndexException {
+        try {
+            Stream.of(indexes).map(e-> e.split("[,\\-]")).flatMap(Arrays::stream).forEach(Integer::parseInt);
+        }catch (Exception e){
+            throw new ValidateIndexException("Error during convert indexes");
+        }
     }
 
     public List<List<Integer>> convertIndexes() {
@@ -45,23 +55,18 @@ public class Port {
         return allCombinations;
     }
 
-     List<Integer> parseOneItem(final String item) {
-        try {
-            Pattern pattern = Pattern.compile("^\\d+-\\d+$");
-            if (pattern.matcher(item).find()) {
-                final String[] range = item.split("-");
-                return IntStream.rangeClosed(Integer.parseInt(range[0]), Integer.parseInt(range[1]))
-                        .boxed()
-                        .collect(Collectors.toList());
-            }
-            return Collections.singletonList(Integer.parseInt(item));
-        }catch (Exception e){
-            System.out.println("Parse indexes error");
-            return null;
+    List<Integer> parseOneItem(final String item) {
+        Pattern pattern = Pattern.compile("^\\d+-\\d+$");
+        if (pattern.matcher(item).find()) {
+            final String[] range = item.split("-");
+            return IntStream.rangeClosed(Integer.parseInt(range[0]), Integer.parseInt(range[1]))
+                    .boxed()
+                    .collect(Collectors.toList());
         }
+        return Collections.singletonList(Integer.parseInt(item));
     }
 
-     List<Integer> parseAll(final String str) {
+    List<Integer> parseAll(final String str) {
         return Arrays.stream(str.split(","))
                 .map(this::parseOneItem)
                 .flatMap(List::stream)
